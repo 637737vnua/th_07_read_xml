@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -18,6 +19,9 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         anhxa();
         dbConnect();
-        paserXML();
+        new ReadRSS().execute("https://timoday.edu.vn/post-sitemap.xml");
         getData();
 
         listView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
@@ -49,24 +53,60 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void paserXML() {
-        XmlPullParserFactory parserFactory;
-        try {
-            parserFactory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = parserFactory.newPullParser();
+    private class ReadRSS extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            XmlPullParserFactory parserFactory = null;
+            try {
+                parserFactory = XmlPullParserFactory.newInstance();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            XmlPullParser parser = null;
+            try {
+                parser = parserFactory.newPullParser();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            try {
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            try {
+                URL url = new URL(strings[0]);
+                HttpURLConnection http = (HttpURLConnection)url.openConnection();
+                http.setDoInput(true);
+                http.connect();
 
-            InputStream is = getAssets().open("sitemap.xml");
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(is, null);
+                InputStream is = http.getInputStream();
+                
+                parser.setInput(is, null);
 
-            processParsing(parser);
+                processParsing(parser);
+            } catch (MalformedURLException | XmlPullParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        } catch (XmlPullParserException | IOException e) {
-            e.printStackTrace();
+            try {
+                return processParsing(parser);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
         }
     }
 
-    private void processParsing(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private String processParsing(XmlPullParser parser) throws IOException, XmlPullParserException {
         ArrayList<InfoSite> urls = new ArrayList<>();
         int eventType = parser.getEventType();
         InfoSite currentURL = null;
@@ -103,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         printList(urls);
+        return null;
     }
 
     private void printList(ArrayList<InfoSite> list) {
