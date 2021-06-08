@@ -136,10 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getData() {
         urlArrayList.clear();
-        String table = "tblSiteMap";
-        String [] colums = {"id", "URL", "LastChange", "Priority", "ChangeFrequency", "Images"};
-
-        Cursor c1 = db.query(table, colums, null, null, null, null, "id");
+        Cursor c1 = db.rawQuery("SELECT * FROM tblSiteMap", null);
 
         int id = c1.getColumnIndex("id");
         int idUrl = c1.getColumnIndex("URL");
