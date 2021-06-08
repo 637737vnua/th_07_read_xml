@@ -7,13 +7,31 @@
     android:padding="10dp"
     tools:context=".MainActivity">
 
-    <ListView
-        android:id="@+id/lvList"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="2dp"
+        android:orientation="vertical"
+        android:weightSum="12"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/txtCountCollect"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
+
+        <ListView
+            android:id="@+id/lvList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="11.5"
+            android:padding="2dp">
+
+        </ListView>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<ArrayUrl> urlArrayList;
     AdapterView adapter;
     SQLiteDatabase db;
+    TextView txtCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             db.execSQL("CREATE TABLE IF NOT EXISTS tblSiteMap (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "URL varchar(200) UNIQUE," +
-                    "Images varchar(20) /*tinyint*/," +
+                    "Images tinyint," +
                     "Priority float," +
                     "ChangeFrequency varchar(20)," +
                     "LastChange datetime" +
@@ -144,8 +145,9 @@ public class MainActivity extends AppCompatActivity {
         int idPriority = c1.getColumnIndex("Priority");
         int idChangeFrequency = c1.getColumnIndex("ChangeFrequency");
         int idImages = c1.getColumnIndex("Images");
-
+        int count = 0;
         while (c1.moveToNext()) {
+            count++;
             int idValue = c1.getInt(id);
             String Url = c1.getString(idUrl);
             String Date = c1.getString(idDate);
@@ -156,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
             urlArrayList.add(new ArrayUrl(String.valueOf(idValue), Url, Date, Priority, ChangeFrequency, Images));
         }
 
+        txtCount.setText("Số bản ghi hiện có là: "+ count);
         adapter.notifyDataSetChanged();
     }
 
@@ -165,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void anhxa() {
         listView = (ListView) findViewById(R.id.lvList);
+        txtCount = (TextView) findViewById(R.id.txtCountCollect);
         urlArrayList = new ArrayList<>();
 
         adapter = new AdapterView(MainActivity.this, R.layout.line_info, urlArrayList);
