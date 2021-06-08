@@ -56,47 +56,30 @@ public class MainActivity extends AppCompatActivity {
     private class ReadRSS extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
-            XmlPullParserFactory parserFactory = null;
-            try {
-                parserFactory = XmlPullParserFactory.newInstance();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            }
-            XmlPullParser parser = null;
-            try {
-                parser = parserFactory.newPullParser();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            }
-            try {
-                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            }
+            XmlPullParserFactory parserFactory;
+            XmlPullParser parser;
+
             try {
                 URL url = new URL(strings[0]);
                 HttpURLConnection http = (HttpURLConnection)url.openConnection();
                 http.setDoInput(true);
                 http.connect();
 
+                parserFactory = XmlPullParserFactory.newInstance();
+                parser = parserFactory.newPullParser();
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+
                 InputStream is = http.getInputStream();
                 
                 parser.setInput(is, null);
-
-                processParsing(parser);
-            } catch (MalformedURLException | XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
                 return processParsing(parser);
-            } catch (IOException e) {
-                e.printStackTrace();
+
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
             return null;
         }
 
